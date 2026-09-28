@@ -24,6 +24,211 @@
 </head>
 
 <body>
+
+  <!-- ============================================
+       TERMS & CONDITIONS MODAL
+       Version-controlled via localStorage.
+       To re-show T&C to all users: increment TC_VERSION below.
+       ============================================ -->
+  <div id="tc-overlay" role="dialog" aria-modal="true" aria-labelledby="tc-title">
+    <div id="tc-modal">
+      <div id="tc-header">
+        <span id="tc-badge">⚠ Required — Please Read</span>
+        <h2 id="tc-title">Terms &amp; Conditions</h2>
+        <p>You must accept these terms to access the tournament platform.</p>
+      </div>
+
+      <div id="tc-body">
+
+        <div class="tc-section">
+          <h3>1. Eligibility and Registration</h3>
+          <p>Players must be <strong style="color:#eaeff3;">18 years or older</strong> to participate. Each player requires a unique Free Fire MAX UID. One player cannot be on multiple teams. Registration is confirmed upon form submission and must be completed before the tournament deadline.</p>
+          <ul>
+            <li>Roster size: Up to <span class="tc-highlight">4 players</span> per squad</li>
+            <li>Substitutes allowed with prior notification</li>
+            <li>False or incorrect details lead to <strong style="color:#ff4b1f;">immediate disqualification</strong></li>
+          </ul>
+        </div>
+
+        <hr class="tc-divider">
+
+        <div class="tc-section">
+          <h3>2. Entry Fee and Refunds</h3>
+          <p>Entry fee: <span class="tc-highlight">₹160 per team</span> (₹40 per player). Refunds policy:</p>
+          <ul>
+            <li>Organizers cancel the tournament → <strong style="color:#29e1c9;">Full refund</strong></li>
+            <li>Team voluntarily withdraws before start → <strong style="color:#29e1c9;">Full refund</strong></li>
+            <li>Team does not show up without prior withdrawal → <strong style="color:#ff4b1f;">No refund</strong></li>
+            <li>Disqualified due to rule violations → <strong style="color:#ff4b1f;">No refund</strong></li>
+          </ul>
+        </div>
+
+        <hr class="tc-divider">
+
+        <div class="tc-section">
+          <h3>3. Match Format and Schedule</h3>
+          <p>Tournament format: Squad mode on Free Fire MAX. The tournament will consist of <span class="tc-highlight">3 matches</span>. Format and grouping will be decided based on the total number of participating teams. All 3 matches will be counted for prize distribution.</p>
+          <ul>
+            <li>Check-in starts <strong style="color:#eaeff3;">15 minutes</strong> before match start</li>
+            <li>If a team is absent at match start for <em>any</em> reason, the match will <strong style="color:#ff4b1f;">NOT</strong> be restarted</li>
+            <li>Approximately 5 minutes break between matches</li>
+            <li>Match schedule may be updated with notice</li>
+          </ul>
+        </div>
+
+        <hr class="tc-divider">
+
+        <div class="tc-section">
+          <h3>4. Device and Gameplay Rules</h3>
+          <ul>
+            <li>Mobile devices and tablets allowed (no emulators)</li>
+            <li>Must use own registered account</li>
+            <li>No hacks, mods, third-party tools, or macros</li>
+            <li>No teaming with other squads or intentional feeding</li>
+            <li>Internet disconnections do not guarantee replays</li>
+          </ul>
+          <p style="margin-top:8px;"><strong style="color:#ffc93c;">Squad Composition Rule:</strong> The 4 players who participate in the first match must remain the same throughout the entire tournament. <strong style="color:#ff4b1f;">Substitutions are not allowed after the first match.</strong></p>
+        </div>
+
+        <hr class="tc-divider">
+
+        <div class="tc-section">
+          <h3>5. Fair Play and Disqualification</h3>
+          <p>Violations of gameplay rules result in warnings, point deduction, or disqualification. <strong style="color:#eaeff3;">Organizers' decisions are final.</strong> Disputes must be raised within 15 minutes of match end with video evidence.</p>
+        </div>
+
+        <hr class="tc-divider">
+
+        <div class="tc-section">
+          <h3>6. Prizes and Prize Distribution</h3>
+          <p>Revenue breakdown from entry fees:</p>
+          <ul>
+            <li><span class="tc-highlight">20%</span> goes to platform (organizers)</li>
+            <li><span class="tc-highlight">80%</span> goes to prize pool:
+              <ul style="margin-top:4px;">
+                <li>~70% distributed as weekly prizes to top-performing teams</li>
+                <li>~10% distributed to top-performing teams on the leaderboard (cumulative)</li>
+              </ul>
+            </li>
+          </ul>
+          <p style="margin-top:8px;">Winners must claim prizes within <span class="tc-highlight">7 days</span>. Applicable taxes are the responsibility of winners. Prizes are non-transferable.</p>
+        </div>
+
+        <hr class="tc-divider">
+
+        <div class="tc-section">
+          <h3>7. Data Collection and Privacy</h3>
+          <p>We collect only: player name, phone number, and team player names. This information is used for tournament administration only. Data is stored securely and not shared with third parties without consent. To request data deletion, contact any admin via WhatsApp.</p>
+        </div>
+
+        <hr class="tc-divider">
+
+        <div class="tc-section">
+          <h3>8. Liability and Force Majeure</h3>
+          <p>Organizers are not liable for technical failures, server outages, or device issues. The tournament can be postponed or cancelled due to circumstances beyond our control.</p>
+          <p style="margin-top:8px;"><strong style="color:#ffc93c;">Server Issues Protocol:</strong> If the organizers' server experiences issues during a match and the match is exited, all team captains must post their match results in the captains WhatsApp group within <span class="tc-highlight">5 minutes</span> of match completion. Failure to post results within 5 minutes will result in <strong style="color:#ff4b1f;">zero points</strong> for that round.</p>
+        </div>
+
+        <hr class="tc-divider">
+
+        <div class="tc-section">
+          <h3>9. Conduct</h3>
+          <p>All participants must maintain respectful behavior. Abuse, hate speech, or harassment results in removal and potential ban from future tournaments.</p>
+        </div>
+
+        <hr class="tc-divider">
+
+        <div class="tc-section">
+          <h3>10. Governing Terms</h3>
+          <p>By registering, you accept these terms. The organizers may update these terms with notice. Disputes are governed by the <strong style="color:#eaeff3;">laws of India, jurisdiction of Chennai.</strong></p>
+        </div>
+
+      </div><!-- /#tc-body -->
+
+      <div id="tc-footer">
+        <div id="tc-scroll-notice">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          Scroll down to read all terms before accepting
+        </div>
+        <div id="tc-actions">
+          <button id="tc-decline-btn" type="button">Decline</button>
+          <button id="tc-accept-btn" type="button">I Accept the Terms &amp; Conditions</button>
+        </div>
+        <div id="tc-version-tag">v1.1 — Free Fire MAX Tournament Platform</div>
+      </div>
+    </div>
+  </div><!-- /#tc-overlay -->
+
+  <!-- T&C localStorage Logic -->
+  <script>
+    (function () {
+      var TC_VERSION = '1.1';
+      var TC_STORAGE_KEY = 'xero-tc-accepted-version';
+
+      var overlay = document.getElementById('tc-overlay');
+      var tcBody  = document.getElementById('tc-body');
+      var scrollNotice = document.getElementById('tc-scroll-notice');
+
+      // Check if user already accepted this version
+      try {
+        var accepted = localStorage.getItem(TC_STORAGE_KEY);
+        if (accepted === TC_VERSION) {
+          // Already accepted — hide immediately with no animation
+          overlay.style.display = 'none';
+          return;
+        }
+      } catch (e) { /* localStorage unavailable — show modal */ }
+
+      // Lock body scroll while modal is open
+      document.body.style.overflow = 'hidden';
+
+      // Show/hide scroll hint based on scroll position
+      tcBody.addEventListener('scroll', function () {
+        var remaining = tcBody.scrollHeight - tcBody.scrollTop - tcBody.clientHeight;
+        if (remaining < 60) {
+          scrollNotice.classList.add('hide');
+        } else {
+          scrollNotice.classList.remove('hide');
+        }
+      });
+
+      // Accept button
+      document.getElementById('tc-accept-btn').addEventListener('click', function () {
+        try { localStorage.setItem(TC_STORAGE_KEY, TC_VERSION); } catch (e) {}
+        overlay.classList.add('hidden');
+        document.body.style.overflow = '';
+        setTimeout(function () { overlay.style.display = 'none'; }, 350);
+      });
+
+      // Decline button — navigate away
+      document.getElementById('tc-decline-btn').addEventListener('click', function () {
+        document.body.innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0c0f;font-family:Inter,sans-serif;color:#7c8896;text-align:center;padding:24px;">'
+          + '<div><p style="font-size:18px;margin-bottom:12px;color:#eaeff3;">You declined the Terms &amp; Conditions.</p>'
+          + '<p style="font-size:13px;">You cannot access this platform without accepting the terms.</p>'
+          + '<button onclick="location.reload()" style="margin-top:20px;font-family:Teko,sans-serif;font-size:16px;letter-spacing:1px;padding:10px 24px;background:#ff4b1f;color:#0a0c0f;border:none;border-radius:5px;cursor:pointer;">Review Terms Again</button>'
+          + '</div></div>';
+      });
+
+      // Prevent closing by clicking outside the modal
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) {
+          // Shake the modal to indicate it can't be bypassed
+          var modal = document.getElementById('tc-modal');
+          if (modal) {
+            modal.style.transition = 'transform 0.08s ease';
+            modal.style.transform = 'scale(1.015)';
+            setTimeout(function () { modal.style.transform = ''; }, 150);
+          }
+        }
+      });
+
+      // Prevent Escape key from closing
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') e.preventDefault();
+      });
+    })();
+  </script>
+
   <div id="root"></div>
 
   <!-- Plain JS Utils -->
