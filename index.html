@@ -616,7 +616,13 @@
       }, []);
       */
 
-      if (!loaded || !state) return <div className="ff-loading"><div className="pulse">LOADING SYSTEM...</div></div>;
+      if (!loaded || !state) return (
+        <div className="ff-loading">
+          <div className="ff-loading-emblem">⚡</div>
+          <div className="pulse">Initializing</div>
+          <div className="ff-loading-bar"><div className="ff-loading-bar-fill"></div></div>
+        </div>
+      );
 
       const t = state.tournaments.find(x => x.id === selectedTournamentId); // Currently selected tournament
 
@@ -882,51 +888,75 @@
 
       return (
         <div className="ff-root">
-          <header className="ff-header">
-            <div className="ff-titleblock">
-              <span className="eyebrow">SQUAD BATTLE ROYALE</span>
-              <h1>TOURNAMENT CONTROL</h1>
-            </div>
-            <div className="ff-headeractions">
-              <div className={`savechip ${syncStatus ? "show" : ""}`} style={{ marginRight: "8px" }}>{syncStatus}</div>
-              <div className="mode-toggle">
-                <button className={`mode-btn ${!isEditMode ? "active" : ""}`} onClick={() => handleToggleEdit("view")}>VIEW</button>
-                <button className={`mode-btn ${isEditMode ? "active" : ""}`} onClick={() => handleToggleEdit("edit")}>EDIT</button>
+
+          {/* ====== FLOATING PILL NAV ISLAND ====== */}
+          <div id="nav-island">
+            <div id="nav-island-inner">
+
+              {/* Compact pill (visible when scrolled) */}
+              <div className="nav-pill-compact">
+                <span className="nav-pill-title">Tournament Control</span>
+                <div className="nav-live-badge">
+                  <span className="nav-live-dot"></span>
+                  Live
+                </div>
               </div>
+
+              {/* Full expanded header */}
+              <header className="ff-header">
+                <div className="ff-titleblock">
+                  <span className="eyebrow">Squad Battle Royale</span>
+                  <h1>Tournament Control</h1>
+                </div>
+                <div className="ff-headeractions">
+                  <div className="nav-live-badge">
+                    <span className="nav-live-dot"></span>
+                    Live
+                  </div>
+                  <div className={`savechip ${syncStatus ? "show" : ""}`}>{syncStatus}</div>
+                  <div className="mode-toggle">
+                    <button className={`mode-btn ${!isEditMode ? "active" : ""}`} onClick={() => handleToggleEdit("view")}>View</button>
+                    <button className={`mode-btn ${isEditMode ? "active" : ""}`} onClick={() => handleToggleEdit("edit")}>Edit</button>
+                  </div>
+                </div>
+              </header>
+
+              {/* Navigation Tabs */}
+              <nav className="ff-tabs">
+                <button className={`tabbtn ${tab === "global" ? "active" : ""}`} onClick={() => setTab("global")}>Global Leaderboard</button>
+                <button className={`tabbtn ${tab === "register" ? "active" : ""}`} onClick={() => setTab("register")}>Register</button>
+                <button className={`tabbtn ${tab === "setup" ? "active" : ""}`} onClick={() => setTab("setup")}>Setup</button>
+                <button className={`tabbtn ${tab === "A" ? "active" : ""}`} onClick={() => setTab("A")}>Group A</button>
+                <button className={`tabbtn ${tab === "B" ? "active" : ""}`} onClick={() => setTab("B")}>Group B</button>
+                <button className={`tabbtn ${tab === "final" ? "active" : ""}`} onClick={() => setTab("final")}>Finals</button>
+                <button className={`tabbtn ${tab === "admin" ? "active" : ""}`} onClick={() => {
+                  if (!isEditMode) {
+                    const pwd = prompt("Enter Admin Password:");
+                    if (pwd === ADMIN_PASSWORD) {
+                      setIsEditMode(true);
+                      setTab("admin");
+                    } else {
+                      alert("Incorrect password.");
+                    }
+                  } else {
+                    setTab("admin");
+                  }
+                }} style={{ marginLeft: "auto" }}>Admin</button>
+              </nav>
+
             </div>
-          </header>
+          </div>
+          {/* ====== END NAV ISLAND ====== */}
 
           {/* Tournament Context Selector */}
           {state.tournaments.length > 0 && tab !== "global" && tab !== "register" && tab !== "admin" && (
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "16px", background: "var(--panel-alt)", padding: "8px 12px", borderRadius: "6px", border: "1px solid var(--border)" }}>
-              <span className="hint">Selected Tournament context:</span>
-              <select className="dropdown-simple" style={{ width: "250px" }} value={selectedTournamentId} onChange={(e) => setSelectedTournamentId(e.target.value)}>
+            <div className="tournament-selector-strip">
+              <span className="hint">Tournament:</span>
+              <select className="dropdown-simple" style={{ width: "240px" }} value={selectedTournamentId} onChange={(e) => setSelectedTournamentId(e.target.value)}>
                 {state.tournaments.map(x => <option key={x.id} value={x.id}>{x.name}</option>)}
               </select>
             </div>
           )}
-
-          <nav className="ff-tabs">
-            <button className={`tabbtn ${tab === "global" ? "active" : ""}`} onClick={() => setTab("global")}>Global Leaderboard</button>
-            <button className={`tabbtn ${tab === "register" ? "active" : ""}`} onClick={() => setTab("register")}>Registration</button>
-            <button className={`tabbtn ${tab === "setup" ? "active" : ""}`} onClick={() => setTab("setup")}>Setup Groups</button>
-            <button className={`tabbtn ${tab === "A" ? "active" : ""}`} onClick={() => setTab("A")}>Group A</button>
-            <button className={`tabbtn ${tab === "B" ? "active" : ""}`} onClick={() => setTab("B")}>Group B</button>
-            <button className={`tabbtn ${tab === "final" ? "active" : ""}`} onClick={() => setTab("final")}>Finals</button>
-            <button className={`tabbtn ${tab === "admin" ? "active" : ""}`} onClick={() => {
-              if (!isEditMode) {
-                const pwd = prompt("Enter Admin Password:");
-                if (pwd === ADMIN_PASSWORD) {
-                  setIsEditMode(true);
-                  setTab("admin");
-                } else {
-                  alert("Incorrect password.");
-                }
-              } else {
-                setTab("admin");
-              }
-            }} style={{ marginLeft: "auto" }}>Admin Panel</button>
-          </nav>
 
           {/* GLOBAL LEADERBOARD */}
           {tab === "global" && (
@@ -1239,6 +1269,82 @@
       }, 1500);
     });
   </script>
+  <script>
+  (function () {
+    var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* 1. FLOATING PILL NAV - scroll collapse */
+    var navIsland = document.getElementById('nav-island');
+    var lastScrollY = 0, ticking = false;
+    function onScroll() {
+      lastScrollY = window.scrollY;
+      if (!ticking) {
+        window.requestAnimationFrame(function () {
+          if (navIsland) {
+            if (lastScrollY > 60) navIsland.classList.add('scrolled');
+            else navIsland.classList.remove('scrolled');
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    /* 2. 3D TILT + SHEEN */
+    function initCardTilt() {
+      document.querySelectorAll('.panel, .roster-row').forEach(function (card) {
+        if (card._tiltInited) return;
+        card._tiltInited = true;
+        card.addEventListener('mousemove', function (e) {
+          if (reducedMotion) return;
+          var r = card.getBoundingClientRect();
+          var x = e.clientX - r.left, y = e.clientY - r.top;
+          var rotY = ((x - r.width/2) / (r.width/2)) * 6;
+          var rotX = -((y - r.height/2) / (r.height/2)) * 4;
+          card.style.transform = 'perspective(1000px) rotateX('+rotX+'deg) rotateY('+rotY+'deg) translateZ(4px)';
+          card.style.transition = 'transform 0.12s ease';
+          card.style.setProperty('--mouse-x', ((x/r.width)*100).toFixed(1)+'%');
+          card.style.setProperty('--mouse-y', ((y/r.height)*100).toFixed(1)+'%');
+        });
+        card.addEventListener('mouseleave', function () {
+          card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0)';
+          card.style.transition = 'transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+          card.style.setProperty('--mouse-x', '50%');
+          card.style.setProperty('--mouse-y', '-20%');
+        });
+      });
+    }
+    new MutationObserver(function() { setTimeout(initCardTilt, 100); }).observe(document.body, { childList: true, subtree: true });
+    setTimeout(initCardTilt, 900);
+
+    /* 3. SCROLL TEXT SCRUB */
+    var scrubTimer;
+    function initTextScrub() {
+      document.querySelectorAll('.panel-head h2').forEach(function (el) {
+        if (el.dataset.scrubbed) return;
+        el.dataset.scrubbed = '1';
+        var txt = el.textContent;
+        el.innerHTML = txt.split(' ').map(function(w){ return '<span class="scrub-word">'+w+'</span>'; }).join(' ');
+        if (reducedMotion) { el.querySelectorAll('.scrub-word').forEach(function(s){ s.classList.add('lit'); }); return; }
+        var words = el.querySelectorAll('.scrub-word');
+        var io = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+              words.forEach(function(w,i){ setTimeout(function(){ w.classList.add('lit'); }, i*55); });
+              io.unobserve(el);
+            }
+          });
+        }, { threshold: 0.5 });
+        io.observe(el);
+      });
+    }
+    new MutationObserver(function(){ clearTimeout(scrubTimer); scrubTimer = setTimeout(initTextScrub, 300); }).observe(document.body, { childList: true, subtree: true });
+    setTimeout(initTextScrub, 1400);
+
+  })();
+  </script>
 </body>
+
 
 </html>
