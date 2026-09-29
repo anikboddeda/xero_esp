@@ -346,6 +346,135 @@
       }
 
       // ==========================================
+      // MONTHLY LEADERBOARD COMPONENT
+      // ==========================================
+      function MonthlyLeaderboard({ teams, tournaments }) {
+        // Collect all matches from all tournaments, sorted by their insertion order
+        // Each match is assigned a sequential week number based on tournament ordering
+        const allMatches = useMemo(() => {
+          const matches = [];
+          tournaments.forEach(tourney => {
+            [...tourney.groupMatches, ...tourney.finalMatches].forEach(m => {
+              matches.push({ ...m, tournamentId: tourney.id });
+            });
+          });
+          return matches;
+        }, [tournaments]);
+
+        // Assign week numbers: each tournament counts as one "week" block.
+        // We track unique tournament appearances in order — each distinct tournament = one week.
+        const weeklyBuckets = useMemo(() => {
+          // Group matches by tournament, preserve order of first appearance
+          const tourneyOrder = [];
+          const byTourney = {};
+          allMatches.forEach(m => {
+            if (!byTourney[m.tournamentId]) {
+              byTourney[m.tournamentId] = [];
+              tourneyOrder.push(m.tournamentId);
+            }
+            byTourney[m.tournamentId].push(m);
+          });
+          // Each tournament = one week (index 1-based)
+          return tourneyOrder.map((tid, idx) => ({
+            weekNum: idx + 1,
+            tournamentId: tid,
+            matches: byTourney[tid]
+          }));
+        }, [allMatches]);
+
+        // Group weeks into months: Month 1 = Weeks 1-4, Month 2 = Weeks 5-8, etc.
+        const months = useMemo(() => {
+          const result = [];
+          for (let i = 0; i < weeklyBuckets.length; i += 4) {
+            const chunk = weeklyBuckets.slice(i, i + 4);
+            const monthNum = Math.floor(i / 4) + 1;
+            const weeksInMonth = chunk.map(w => w.weekNum);
+            const matchesInMonth = chunk.flatMap(w => w.matches);
+            result.push({ monthNum, weeksInMonth, matches: matchesInMonth });
+          }
+          return result;
+        }, [weeklyBuckets]);
+
+        // Default to the latest month that has data
+        const defaultMonthIdx = months.length > 0 ? months.length - 1 : 0;
+        const [selectedMonthIdx, setSelectedMonthIdx] = useState(defaultMonthIdx);
+
+        // Update default when data changes
+        useEffect(() => {
+          setSelectedMonthIdx(months.length > 0 ? months.length - 1 : 0);
+        }, [months.length]);
+
+        const selectedMonth = months[selectedMonthIdx];
+
+        // Compute standings for the selected month
+        const monthStandings = useMemo(() => {
+          if (!selectedMonth) return [];
+          const teamIds = teams.map(t => t.id);
+          return computeStandings(teamIds, teams, selectedMonth.matches);
+        }, [selectedMonth, teams]);
+
+        if (months.length === 0) {
+          return (
+            <div style={{ textAlign: 'center', padding: '40px 0' }}>
+              <p className="hint">No match data available yet. Monthly standings will appear once matches are logged.</p>
+            </div>
+          );
+        }
+
+        return (
+          <div>
+            {/* Month Selector */}
+            <div className="month-selector">
+              <button
+                className="month-nav-btn"
+                onClick={() => setSelectedMonthIdx(i => Math.max(0, i - 1))}
+                disabled={selectedMonthIdx === 0}
+                aria-label="Previous month"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M15 18l-6-6 6-6" />
+                </svg>
+              </button>
+
+              <div className="month-selector-pills">
+                {months.map((m, idx) => (
+                  <button
+                    key={m.monthNum}
+                    className={`month-pill${selectedMonthIdx === idx ? ' active' : ''}`}
+                    onClick={() => setSelectedMonthIdx(idx)}
+                  >
+                    Month {m.monthNum}
+                    {selectedMonthIdx === idx && (
+                      <span className="month-pill-weeks">Wk {m.weeksInMonth[0]}–{m.weeksInMonth[m.weeksInMonth.length - 1]}</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                className="month-nav-btn"
+                onClick={() => setSelectedMonthIdx(i => Math.min(months.length - 1, i + 1))}
+                disabled={selectedMonthIdx === months.length - 1}
+                aria-label="Next month"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 18l6-6-6-6" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="month-meta">
+              <span className="hint">
+                Month {selectedMonth.monthNum} aggregates Weeks {selectedMonth.weeksInMonth[0]}–{selectedMonth.weeksInMonth[selectedMonth.weeksInMonth.length - 1]} &nbsp;·&nbsp; {selectedMonth.matches.length} match{selectedMonth.matches.length !== 1 ? 'es' : ''}
+              </span>
+            </div>
+
+            <StandingsTable rows={monthStandings} medalTop3={true} />
+          </div>
+        );
+      }
+
+      // ==========================================
       // MATCH FORM
       // ==========================================
       function MatchForm({ allTeams, availableTeamIds, onSubmit, onCancel, label, defaultMap }) {
@@ -903,6 +1032,115 @@
         const globalMatches = state.tournaments.flatMap(x => [...x.groupMatches, ...x.finalMatches]);
         const globalStandings = computeStandings(state.teams.map(team => team.id), state.teams, globalMatches);
 
+        // LeaderboardShell — dual-view wrapper (defined here to access globalStandings in closure)
+        function LeaderboardShell({ teams, tournaments, globalStandings }) {
+          const [lbView, setLbView] = useState('global'); // 'global' | 'monthly'
+          const [animating, setAnimating] = useState(false);
+          const [slideDir, setSlideDir] = useState('left'); // direction new panel slides in from
+          const containerRef = useRef(null);
+          const touchStartX = useRef(null);
+          const touchStartY = useRef(null);
+
+          const switchView = (next) => {
+            if (next === lbView || animating) return;
+            setSlideDir(next === 'monthly' ? 'left' : 'right');
+            setAnimating(true);
+            setTimeout(() => {
+              setLbView(next);
+              setAnimating(false);
+            }, 260);
+          };
+
+          // Touch/swipe handlers — ignore if user is scrolling table horizontally
+          const onTouchStart = (e) => {
+            touchStartX.current = e.touches[0].clientX;
+            touchStartY.current = e.touches[0].clientY;
+          };
+          const onTouchEnd = (e) => {
+            if (touchStartX.current === null) return;
+            const dx = e.changedTouches[0].clientX - touchStartX.current;
+            const dy = e.changedTouches[0].clientY - touchStartY.current;
+            // Only treat as horizontal swipe if dx dominates dy significantly
+            if (Math.abs(dx) > Math.abs(dy) * 1.5 && Math.abs(dx) > 40) {
+              if (dx < 0 && lbView === 'global') switchView('monthly');   // swipe left → monthly
+              if (dx > 0 && lbView === 'monthly') switchView('global');    // swipe right → global
+            }
+            touchStartX.current = null;
+            touchStartY.current = null;
+          };
+
+          return (
+            <section
+              className="panel lb-shell"
+              ref={containerRef}
+              onTouchStart={onTouchStart}
+              onTouchEnd={onTouchEnd}
+            >
+              {/* Header row */}
+              <div className="panel-head">
+                <h2>
+                  {lbView === 'global' ? 'Global Leaderboard' : 'Monthly Leaderboard'}
+                </h2>
+                <div className="lb-header-right">
+                  <span className="hint" style={{ marginRight: '10px' }}>
+                    {lbView === 'global'
+                      ? `Total Registered Teams: ${teams.length}`
+                      : 'Aggregated by 4-week blocks'}
+                  </span>
+                  {/* Pill toggle */}
+                  <div className="lb-view-toggle">
+                    <button
+                      id="lb-toggle-global"
+                      className={`lb-toggle-btn${lbView === 'global' ? ' active' : ''}`}
+                      onClick={() => switchView('global')}
+                    >Global</button>
+                    <button
+                      id="lb-toggle-monthly"
+                      className={`lb-toggle-btn${lbView === 'monthly' ? ' active' : ''}`}
+                      onClick={() => switchView('monthly')}
+                    >Monthly</button>
+                  </div>
+                  {/* Arrow carousel button */}
+                  <button
+                    id="lb-carousel-arrow"
+                    className="lb-carousel-btn"
+                    onClick={() => switchView(lbView === 'global' ? 'monthly' : 'global')}
+                    title={lbView === 'global' ? 'Switch to Monthly' : 'Switch to Global'}
+                    aria-label={lbView === 'global' ? 'Switch to Monthly Leaderboard' : 'Switch to Global Leaderboard'}
+                  >
+                    <svg
+                      width="14" height="14" viewBox="0 0 24 24" fill="none"
+                      stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
+                      style={{ transition: 'transform 0.3s var(--ease-out)', transform: lbView === 'monthly' ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                    >
+                      <path d="M9 18l6-6-6-6" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
+              {/* Sliding content area */}
+              <div
+                className={`lb-slide-wrap${animating ? ` lb-slide-exit-${slideDir}` : ''}`}
+                style={{ overflow: 'hidden' }}
+              >
+                {lbView === 'global'
+                  ? <StandingsTable rows={globalStandings} medalTop3={true} />
+                  : <MonthlyLeaderboard teams={teams} tournaments={tournaments} />
+                }
+              </div>
+
+              {/* Mobile swipe hint */}
+              <div className="lb-swipe-hint">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+                Swipe to switch view
+              </div>
+            </section>
+          );
+        }
+
         const groupAStandings = t ? computeStandings(t.groupA, state.teams, t.groupMatches.filter(m => m.group === "A")) : [];
         const groupBStandings = t ? computeStandings(t.groupB, state.teams, t.groupMatches.filter(m => m.group === "B")) : [];
 
@@ -975,15 +1213,13 @@
               </div>
             )}
 
-            {/* GLOBAL LEADERBOARD */}
+            {/* GLOBAL + MONTHLY LEADERBOARD */}
             {tab === "global" && (
-              <section className="panel">
-                <div className="panel-head">
-                  <h2>Global Leaderboard</h2>
-                  <span className="hint">Accumulates points across ALL tournaments. Total Registered Teams: {state.teams.length}</span>
-                </div>
-                <StandingsTable rows={globalStandings} medalTop3={true} />
-              </section>
+              <LeaderboardShell
+                teams={state.teams}
+                tournaments={state.tournaments}
+                globalStandings={globalStandings}
+              />
             )}
 
             {/* REGISTRATION */}

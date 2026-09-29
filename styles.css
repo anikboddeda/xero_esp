@@ -1461,7 +1461,242 @@ select.dropdown-simple:focus {
 }
 
 /* ============================================================
-   18. RESPONSIVE
+   18. LEADERBOARD DUAL-VIEW — Global ↔ Monthly
+   ============================================================ */
+
+/* Shell panel keeps overflow hidden so slide animation is clipped */
+.lb-shell {
+  overflow: hidden;
+}
+
+/* Header right-side cluster */
+.lb-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ---- Pill toggle [ Global | Monthly ] ---- */
+.lb-view-toggle {
+  display: flex;
+  gap: 2px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 3px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.lb-toggle-btn {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  padding: 4px 12px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.22s var(--ease-out);
+  white-space: nowrap;
+}
+
+.lb-toggle-btn.active {
+  background: rgba(255, 255, 255, 0.10);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.lb-toggle-btn:hover:not(.active) {
+  color: var(--text-2);
+}
+
+/* ---- Carousel arrow button ---- */
+.lb-carousel-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.22s var(--ease-out);
+  position: relative;
+  overflow: hidden;
+}
+
+.lb-carousel-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.08);
+  opacity: 0;
+  transition: opacity 0.18s;
+}
+
+.lb-carousel-btn:hover {
+  border-color: var(--border-hover);
+  color: var(--text);
+  box-shadow: 0 0 0 2px rgba(41, 151, 255, 0.12);
+}
+
+.lb-carousel-btn:hover::after {
+  opacity: 1;
+}
+
+.lb-carousel-btn:active {
+  transform: scale(0.94) translateZ(0);
+}
+
+/* ---- Slide transition wrapper ---- */
+.lb-slide-wrap {
+  transition: opacity 0.26s var(--ease-out), transform 0.26s var(--ease-out);
+  will-change: opacity, transform;
+}
+
+.lb-slide-exit-left {
+  opacity: 0;
+  transform: translateX(-18px) translateZ(0);
+}
+
+.lb-slide-exit-right {
+  opacity: 0;
+  transform: translateX(18px) translateZ(0);
+}
+
+/* ---- Mobile swipe hint (hidden on desktop) ---- */
+.lb-swipe-hint {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.10em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-top: 12px;
+  opacity: 0.55;
+}
+
+/* ============================================================
+   19. MONTH SELECTOR — within Monthly Leaderboard
+   ============================================================ */
+
+.month-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  margin-top: 4px;
+}
+
+/* Prev/next nav arrows */
+.month-nav-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.22s var(--ease-out);
+}
+
+.month-nav-btn:hover:not(:disabled) {
+  border-color: var(--border-hover);
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.month-nav-btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+/* Scrollable pill strip */
+.month-selector-pills {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  flex: 1;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 2px 0;
+}
+
+.month-selector-pills::-webkit-scrollbar {
+  display: none;
+}
+
+/* Individual month pill */
+.month-pill {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  padding: 5px 14px;
+  border-radius: 50px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.22s var(--ease-out);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.month-pill:hover:not(.active) {
+  border-color: var(--border-hover);
+  color: var(--text-2);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.month-pill.active {
+  background: rgba(41, 151, 255, 0.10);
+  border-color: rgba(41, 151, 255, 0.38);
+  color: var(--blue);
+  font-weight: 600;
+  box-shadow: 0 0 0 2px rgba(41, 151, 255, 0.08);
+}
+
+/* Inline week range badge inside active pill */
+.month-pill-weeks {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: rgba(41, 151, 255, 0.7);
+  background: rgba(41, 151, 255, 0.08);
+  border: 1px solid rgba(41, 151, 255, 0.18);
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+
+/* Month meta info line */
+.month-meta {
+  margin-bottom: 10px;
+  margin-top: 6px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* ============================================================
+   20. RESPONSIVE
    ============================================================ */
 @media (max-width: 768px) {
   #nav-island { width: calc(100% - 20px); }
@@ -1477,6 +1712,23 @@ select.dropdown-simple:focus {
   .ff-headeractions .mode-toggle {
     transform: scale(0.75);
     transform-origin: top right;
+  }
+
+  /* Leaderboard dual-view — mobile overrides */
+  .lb-header-right {
+    gap: 6px;
+  }
+  /* Hide carousel arrow on mobile (swipe is the gesture) */
+  .lb-carousel-btn {
+    display: none;
+  }
+  /* Show swipe hint on mobile */
+  .lb-swipe-hint {
+    display: flex;
+  }
+  /* Hint text in panel-head wraps nicely */
+  .lb-header-right > .hint {
+    display: none; /* save space on mobile */
   }
 }
 
