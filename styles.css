@@ -1204,7 +1204,7 @@ select.dropdown-simple:focus {
    ============================================================ */
 @media (max-width: 768px) {
   #nav-island { width: calc(100% - 20px); }
-  .ff-root { padding: 180px 12px 60px; }
+  .ff-root { padding: 220px 12px 60px; }
   .panel { border-radius: 16px; padding: 16px; }
   .tabbtn { font-size: 12px; padding: 5px 10px; }
 }
