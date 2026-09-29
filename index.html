@@ -944,8 +944,8 @@
                   </div>
                 </header>
 
-                {/* Navigation Tabs — desktop only, hidden on mobile via CSS */}
-                <nav className="ff-tabs desktop-tabs">
+                {/* Navigation Tabs */}
+                <nav className="ff-tabs">
                   <button className={`tabbtn ${tab === "global" ? "active" : ""}`} onClick={() => setTab("global")}>Global Leaderboard</button>
                   <button className={`tabbtn ${tab === "register" ? "active" : ""}`} onClick={() => setTab("register")}>Register</button>
                   <button className={`tabbtn ${tab === "setup" ? "active" : ""}`} onClick={() => setTab("setup")}>Setup</button>
@@ -961,51 +961,9 @@
                   }} style={{ marginLeft: "auto" }}>Admin</button>
                 </nav>
 
-
               </div>
             </div>
             {/* ====== END NAV ISLAND ====== */}
-
-          {/* ====== MOBILE BOTTOM NAV (hidden on desktop via CSS) ====== */}
-          <nav id="mobile-bottom-nav">
-            <div id="mobile-bottom-nav-inner">
-              <button className={`mbn-btn ${tab === "global" ? "active" : ""}`} onClick={() => setTab("global")}>
-                <span className="mbn-icon">🏆</span>
-                <span className="mbn-label">Leaderboard</span>
-              </button>
-              <button className={`mbn-btn ${tab === "register" ? "active" : ""}`} onClick={() => setTab("register")}>
-                <span className="mbn-icon">📋</span>
-                <span className="mbn-label">Register</span>
-              </button>
-              <button className={`mbn-btn ${tab === "setup" ? "active" : ""}`} onClick={() => setTab("setup")}>
-                <span className="mbn-icon">⚙️</span>
-                <span className="mbn-label">Setup</span>
-              </button>
-              <button className={`mbn-btn ${tab === "A" ? "active" : ""}`} onClick={() => setTab("A")}>
-                <span className="mbn-icon">🅐</span>
-                <span className="mbn-label">Group A</span>
-              </button>
-              <button className={`mbn-btn ${tab === "B" ? "active" : ""}`} onClick={() => setTab("B")}>
-                <span className="mbn-icon">🅑</span>
-                <span className="mbn-label">Group B</span>
-              </button>
-              <button className={`mbn-btn ${tab === "final" ? "active" : ""}`} onClick={() => setTab("final")}>
-                <span className="mbn-icon">🥇</span>
-                <span className="mbn-label">Finals</span>
-              </button>
-              <button className={`mbn-btn ${tab === "admin" ? "active" : ""}`} onClick={() => {
-                if (!isEditMode) {
-                  const pwd = prompt("Enter Admin Password:");
-                  if (pwd === ADMIN_PASSWORD) { setIsEditMode(true); setTab("admin"); }
-                  else alert("Incorrect password.");
-                } else { setTab("admin"); }
-              }}>
-                <span className="mbn-icon">🛡️</span>
-                <span className="mbn-label">Admin</span>
-              </button>
-            </div>
-          </nav>
-          {/* ====== END MOBILE BOTTOM NAV ====== */}
 
             {/* Tournament Context Selector */}
             {state.tournaments.length > 0 && tab !== "global" && tab !== "register" && tab !== "admin" && (

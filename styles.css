@@ -421,12 +421,6 @@ body::after {
   align-items: center;
 }
 
-/* ============================================================
-   5b. MOBILE BOTTOM NAVIGATION BAR
-   Hidden on desktop — shown only on mobile via @media
-   ============================================================ */
-#mobile-bottom-nav { display: none; }
-
 .tabbtn {
   font-family: var(--font-ui);
   font-size: 13px;
@@ -1469,21 +1463,11 @@ select.dropdown-simple:focus {
 /* ============================================================
    18. RESPONSIVE
    ============================================================ */
-
-/* ---- MOBILE ONLY: ≤767px ---- */
-@media (max-width: 767px) {
-
-  /* Hide the desktop tab row completely */
-  .desktop-tabs { display: none !important; }
-
-  /* Nav island width */
+@media (max-width: 768px) {
   #nav-island { width: calc(100% - 20px); }
-
-  /* Content area: reduced top padding (no tab row above),
-     bottom padding to clear the sticky bottom nav */
-  .ff-root { padding: 130px 12px 84px; }
-
+  .ff-root { padding: 180px 12px 60px; }
   .panel { border-radius: 16px; padding: 16px; }
+  .tabbtn { font-size: 12px; padding: 5px 10px; }
 
   /* Scale LIVE badge and View/Edit toggle to 75% on mobile */
   .ff-headeractions .nav-live-badge {
@@ -1494,93 +1478,7 @@ select.dropdown-simple:focus {
     transform: scale(0.75);
     transform-origin: top right;
   }
-
-  /* ==================================================
-     MOBILE STICKY BOTTOM NAVIGATION BAR
-     ================================================== */
-  #mobile-bottom-nav {
-    display: block;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 950;
-    background: rgba(8, 8, 14, 0.97);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-    backdrop-filter: blur(24px) saturate(180%);
-    border-top: 1px solid rgba(255, 255, 255, 0.09);
-    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.6), 0 -1px 0 rgba(255, 255, 255, 0.04);
-    /* iPhone safe area support */
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-  }
-
-  #mobile-bottom-nav-inner {
-    display: flex;
-    flex-direction: row;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    padding: 0 4px;
-  }
-
-  #mobile-bottom-nav-inner::-webkit-scrollbar { display: none; }
-
-  .mbn-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    flex: 0 0 auto;
-    min-width: 60px;
-    padding: 8px 10px 10px;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: var(--muted);
-    font-family: var(--font-ui);
-    transition: color 0.2s ease, background 0.2s ease;
-    position: relative;
-  }
-
-  /* Active indicator: top accent bar */
-  .mbn-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%) scaleX(0);
-    width: 28px;
-    height: 2px;
-    border-radius: 0 0 3px 3px;
-    background: var(--accent);
-    transition: transform 0.22s var(--ease-out);
-  }
-
-  .mbn-btn.active { color: var(--text); }
-  .mbn-btn.active::before { transform: translateX(-50%) scaleX(1); }
-
-  .mbn-btn:hover:not(.active) {
-    color: var(--text-2);
-    background: rgba(255, 255, 255, 0.04);
-  }
-
-  .mbn-icon {
-    font-size: 17px;
-    line-height: 1;
-    display: block;
-  }
-
-  .mbn-label {
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: -0.01em;
-    white-space: nowrap;
-    line-height: 1;
-  }
 }
-
 
 @media (max-width: 480px) {
   .matchform-row {
