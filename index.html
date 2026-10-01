@@ -618,6 +618,185 @@
       }
 
 
+
+      // ==========================================
+      // PREVIOUS WINNERS TAB
+      // ==========================================
+
+      // Default crest images - cycle through when a team has no crest
+      const DEFAULT_CRESTS = ['default_1.png', 'default_2.png', 'default_3.png', 'default_4.png'];
+
+      // Xero-ESP logo - shown bottom-left on every winner card
+      const XERO_LOGO = 'xero_logo.png';
+
+      // Per-week overrides - add team-specific crest/main image here once provided
+      // Format: weekNum: { mainImg: 'promo.png', crestImg: 'team_crest.png' }
+      const WEEK_IMAGES = {};
+
+      function WinnerCard({ weekNum, teamName, captain, mainImg, crestImg, logoImg, style }) {
+        return (
+          <div className="winner-card" style={style}>
+            {/* Main promo image - top right */}
+            {mainImg
+              ? <img className="winner-card-main-img" src={mainImg} alt="Tournament promo" />
+              : <div className="winner-card-no-img">🎮</div>
+            }
+            {/* Gradient overlays */}
+            <div className="winner-card-img-fade" />
+            <div className="winner-card-bottom-fade" />
+            {/* Crest - bottom right */}
+            <img className="winner-card-crest" src={crestImg} alt={teamName + ' crest'} />
+            {/* Logo - bottom left (Xero-ESP brand logo) */}
+            <img className="winner-card-logo" src={logoImg} alt="Xero-ESP" />
+            {/* Text content */}
+            <div className="winner-card-text">
+              <span className="winner-card-week">Week {weekNum}</span>
+              <div className="winner-card-info">
+                <span className="winner-card-team-name">{teamName}</span>
+                <span className="winner-card-captain">@{captain}</span>
+                <span className="winner-card-captain-label">Team Captain</span>
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function WinnersTab({ teams, tournaments, onNavigateRegister }) {
+        const [winners, setWinners] = React.useState([]);
+        const [nextTournament, setNextTournament] = React.useState(null);
+        const [loading, setLoading] = React.useState(true);
+
+        React.useEffect(() => {
+          const weekWinners = [];
+          tournaments.forEach((tourney, idx) => {
+            const weekNum = idx + 1;
+            const allMatches = [...tourney.groupMatches, ...tourney.finalMatches];
+            if (allMatches.length === 0) return;
+            const teamIds = [...new Set(allMatches.flatMap(m => m.results.map(r => r.teamId)))];
+            if (teamIds.length === 0) return;
+            const standings = computeStandings(teamIds, teams, allMatches);
+            if (standings.length === 0) return;
+            const winner = standings[0];
+            const team = teams.find(t => t.id === winner.id);
+            if (!team) return;
+            const weekImgData = WEEK_IMAGES[weekNum] || {};
+            weekWinners.push({
+              weekNum,
+              tournamentName: tourney.name,
+              teamName: team.name,
+              captain: team.captain || 'Unknown',
+              mainImg: weekImgData.mainImg || null,
+              crestImg: weekImgData.crestImg || DEFAULT_CRESTS[(weekNum - 1) % DEFAULT_CRESTS.length],
+              logoImg: XERO_LOGO,
+              points: winner.points,
+              kills: winner.kills,
+            });
+          });
+          weekWinners.sort((a, b) => b.weekNum - a.weekNum);
+          setWinners(weekWinners);
+          const upcoming = tournaments.find(t =>
+            t.status === 'active' &&
+            t.groupMatches.length === 0 &&
+            t.finalMatches.length === 0 &&
+            t.participants.length > 0
+          );
+          setNextTournament(upcoming || null);
+          setLoading(false);
+        }, [teams, tournaments]);
+
+        if (loading) {
+          return (
+            <section className="panel">
+              <div className="winners-grid">
+                {[1,2,3].map(i => <div key={i} className="winner-card-skeleton" />)}
+              </div>
+            </section>
+          );
+        }
+
+        return (
+          <section className="panel" style={{ maxWidth: '100%' }}>
+            <div className="winners-section-heading">
+              <div className="winners-section-heading-left">
+                <span className="winners-crown-icon">👑</span>
+                <h2>Previous Winners</h2>
+              </div>
+              <img src="xero_logo.png" alt="Xero-ESP" className="winners-xero-logo" />
+            </div>
+            <p className="winners-subtitle">
+              {winners.length > 0
+                ? (winners.length + ' tournament' + (winners.length !== 1 ? 's' : '') + ' completed - Latest first')
+                : 'Winners will appear here once tournaments are completed.'}
+            </p>
+
+            <div className="winners-grid">
+              {winners.length === 0 ? (
+                <div className="winners-empty-state">
+                  <span className="winners-empty-icon">🏆</span>
+                  <p>No winners yet.</p>
+                  <p className="hint" style={{ marginTop: '8px' }}>Complete a tournament to see the champion here!</p>
+                </div>
+              ) : (
+                winners.map((w, i) => (
+                  <WinnerCard
+                    key={w.weekNum}
+                    weekNum={w.weekNum}
+                    teamName={w.teamName}
+                    captain={w.captain}
+                    mainImg={w.mainImg}
+                    crestImg={w.crestImg}
+                    logoImg={w.logoImg}
+                    style={{ animationDelay: `${0.05 + i * 0.07}s` }}
+                  />
+                ))
+              )}
+            </div>
+
+            {/* Next Tournament Section */}
+            <div className="next-tournament-section">
+              <div className="next-tournament-divider">
+                <span className="next-tournament-label">Next Up</span>
+              </div>
+              <div className="next-tournament-card">
+                <div className="next-tournament-icon">⚡</div>
+                <div className="next-tournament-content">
+                  <div className="next-tournament-eyebrow">Coming Next</div>
+                  {nextTournament ? (
+                    <>
+                      <div className="next-tournament-title">{nextTournament.name}</div>
+                      <div className="next-tournament-meta">
+                        {nextTournament.participants.length} team{nextTournament.participants.length !== 1 ? 's' : ''} registered - Who will win?
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="next-tournament-title">Who Will Win?</div>
+                      <div className="next-tournament-meta">The next tournament hasn’t been announced yet. Stay tuned!</div>
+                    </>
+                  )}
+                </div>
+                <div className="next-tournament-cta">
+                  {nextTournament ? (
+                    <button
+                      id="winners-register-now-btn"
+                      className="btn btn-accent"
+                      onClick={() => onNavigateRegister()}
+                    >
+                      Register Now
+                    </button>
+                  ) : (
+                    <span className="coming-soon-badge">
+                      <span className="nav-live-dot" />
+                      Coming Soon
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+      }
+
       // ==========================================
       // APP COMPONENT
       // ==========================================
@@ -1185,6 +1364,7 @@
                 {/* Navigation Tabs */}
                 <nav className="ff-tabs">
                   <button className={`tabbtn ${tab === "global" ? "active" : ""}`} onClick={() => setTab("global")}>Global Leaderboard</button>
+                  <button className={`tabbtn ${tab === "winners" ? "active" : ""}`} onClick={() => setTab("winners")}>🏆 Winners</button>
                   <button className={`tabbtn ${tab === "register" ? "active" : ""}`} onClick={() => setTab("register")}>Register</button>
                   <button className={`tabbtn ${tab === "setup" ? "active" : ""}`} onClick={() => setTab("setup")}>Setup</button>
                   <button className={`tabbtn ${tab === "A" ? "active" : ""}`} onClick={() => setTab("A")}>Group A</button>
@@ -1204,7 +1384,7 @@
             {/* ====== END NAV ISLAND ====== */}
 
             {/* Tournament Context Selector */}
-            {state.tournaments.length > 0 && tab !== "global" && tab !== "register" && tab !== "admin" && (
+            {state.tournaments.length > 0 && tab !== "global" && tab !== "register" && tab !== "admin" && tab !== "winners" && (
               <div className="tournament-selector-strip">
                 <span className="hint">Tournament:</span>
                 <select className="dropdown-simple" style={{ width: "240px" }} value={selectedTournamentId} onChange={(e) => setSelectedTournamentId(e.target.value)}>
@@ -1219,6 +1399,15 @@
                 teams={state.teams}
                 tournaments={state.tournaments}
                 globalStandings={globalStandings}
+              />
+            )}
+
+            {/* PREVIOUS WINNERS */}
+            {tab === "winners" && (
+              <WinnersTab
+                teams={state.teams}
+                tournaments={state.tournaments}
+                onNavigateRegister={() => setTab("register")}
               />
             )}
 
@@ -1487,6 +1676,7 @@
             {!t && (tab === "setup" || tab === "A" || tab === "B" || tab === "final") && (
               <div className="panel"><p className="hint" style={{ textAlign: "center" }}>Please create or select an active tournament first.</p></div>
             )}
+
           </div>
         );
       }
