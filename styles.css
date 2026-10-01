@@ -2317,7 +2317,10 @@ select.dropdown-simple:focus {
   }
 
   .winner-card-crest {
-    width: 68px;
-    height: 68px;
+    width: 272px;
+    height: 272px;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
   }
 }
